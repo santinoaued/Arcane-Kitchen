@@ -64,18 +64,7 @@ public class Enemy : MonoBehaviour
 
         animator.SetTrigger("Attack");
 
-        Collider[] hitPlayers = Physics.OverlapSphere(transform.position, attackRange);
-        foreach (Collider hit in hitPlayers)
-        {
-            if (hit.transform == target)
-            {
-                PlayerHealth playerHealth = hit.GetComponent<PlayerHealth>();
-                if (playerHealth != null)
-                {
-                    playerHealth.TakeDamage(attackDamage);
-                }
-            }
-        }
+        
 
     }
 
