@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 public class playerMovement : MonoBehaviour
 {
     [Header("Movimiento")]
@@ -17,7 +18,6 @@ public class playerMovement : MonoBehaviour
 
     float _moveH, _moveV;
     float _rotationAmount;
-    Quaternion _turnOffset;
 
     Vector3 _velocity;
     bool _isGrounded;
@@ -39,14 +39,15 @@ public class playerMovement : MonoBehaviour
     {
 
         _moveH = Input.GetAxis("Horizontal");
-        _moveV = Input.GetAxisRaw("Vertical");
+        _moveV = Input.GetAxis("Vertical");
 
         _isGrounded = Physics.Raycast(
             groundCheck.position,
             Vector3.down,
-            groundDistance + 0.1f,
+            groundDistance + 0.2f,
             groundLayer
         );
+
 
 
         if (_isGrounded && _velocity.y < 0)
@@ -58,6 +59,13 @@ public class playerMovement : MonoBehaviour
         {
             _velocity.y = Mathf.Sqrt(jumpHeight * -1f * gravity);
         }
+
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            Debug.Log("Presiona W");
+        }
+
+
         _velocity.y += gravity * Time.deltaTime;
 
         animationController.IsGrounded(_isGrounded);
@@ -67,9 +75,8 @@ public class playerMovement : MonoBehaviour
     {
 
         // Rotación
-        _rotationAmount = _moveH * _rotationSpeed * Time.deltaTime;
-        _turnOffset = Quaternion.Euler(0, _rotationAmount, 0);
-        rb.MoveRotation(rb.rotation * _turnOffset);
+        _rotationAmount = _moveH * _rotationSpeed * Time.fixedDeltaTime;
+        transform.Rotate(0, _rotationAmount, 0);
 
         Vector3 moveDirection = transform.forward * _moveV * speed;
 
@@ -79,19 +86,21 @@ public class playerMovement : MonoBehaviour
             moveDirection *= runSpeed;
         }
 
-        if (_moveV == 1)
+
+        if (_moveV < 0)
         {
             Debug.Log("Vertical " + _moveV);
-        }
-
-        if (_moveV == -1)
-        {
             moveDirection *= 0.75f;
         }
 
-        // Aplicar movimiento + gravedad
-        moveDirection.y = _velocity.y;
-        rb.linearVelocity = moveDirection;
+
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            Debug.Log(_isGrounded);
+        }
+
+        Vector3 finalVelocity = new Vector3(moveDirection.x, _velocity.y, moveDirection.z);
+        rb.linearVelocity = finalVelocity;
 
     }
 }
