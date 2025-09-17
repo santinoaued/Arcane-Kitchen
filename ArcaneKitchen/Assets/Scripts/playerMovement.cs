@@ -11,13 +11,11 @@ public class playerMovement : MonoBehaviour
     [SerializeField] Transform groundCheck;
     [SerializeField] float groundDistance = 0.4f;
 
-    [SerializeField] LayerMask groundMask;
+    [SerializeField] LayerMask groundLayer;
 
     Rigidbody rb;
 
     float _moveH, _moveV;
-    Vector3 _movement;
-    Vector3 _moveDirection;
     float _rotationAmount;
     Quaternion _turnOffset;
 
@@ -43,17 +41,11 @@ public class playerMovement : MonoBehaviour
         _moveH = Input.GetAxis("Horizontal");
         _moveV = Input.GetAxisRaw("Vertical");
 
-        Vector3 castPosition = new Vector3(
-            groundCheck.position.x,
-            groundCheck.position.y + 1,
-            groundCheck.position.z
-        );
-
         _isGrounded = Physics.Raycast(
             groundCheck.position,
             Vector3.down,
             groundDistance + 0.1f,
-            groundMask
+            groundLayer
         );
 
 
@@ -74,9 +66,6 @@ public class playerMovement : MonoBehaviour
     void FixedUpdate()
     {
 
-        // Debug.Log("Horizontal " + _moveH);
-        // Debug.Log("Vertical " + _moveV);
-
         // Rotación
         _rotationAmount = _moveH * _rotationSpeed * Time.deltaTime;
         _turnOffset = Quaternion.Euler(0, _rotationAmount, 0);
@@ -88,6 +77,11 @@ public class playerMovement : MonoBehaviour
         if (Input.GetKey(KeyCode.LeftShift))
         {
             moveDirection *= runSpeed;
+        }
+
+        if (_moveV == 1)
+        {
+            Debug.Log("Vertical " + _moveV);
         }
 
         if (_moveV == -1)
