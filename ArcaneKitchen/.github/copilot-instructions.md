@@ -2,7 +2,7 @@
 - Project name: ArcaneKitchen
 - Unity version: Unity 6000.0.57f1
 - Active game object:
-  - Name: thc4_arma
+  - Name: RangedEnemy
   - Tag: Untagged
   - Layer: Default
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->

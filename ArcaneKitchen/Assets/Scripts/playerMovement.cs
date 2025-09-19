@@ -31,7 +31,7 @@ public class playerMovement : MonoBehaviour
 
         if (animationController == null)
         {
-            Debug.LogError("El script 'animationStateController' no se encontró en este GameObject.");
+            Debug.LogError("El script 'animationStateController' no se encontrï¿½ en este GameObject.");
         }
     }
 
@@ -74,7 +74,7 @@ public class playerMovement : MonoBehaviour
     void FixedUpdate()
     {
 
-        // Rotación
+        // Rotaciï¿½n
         _rotationAmount = _moveH * _rotationSpeed * Time.fixedDeltaTime;
         transform.Rotate(0, _rotationAmount, 0);
 
