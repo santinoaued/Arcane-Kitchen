@@ -31,7 +31,7 @@ public class playerMovement : MonoBehaviour
 
         if (animationController == null)
         {
-            Debug.LogError("El script 'animationStateController' no se encontr� en este GameObject.");
+            Debug.LogError("El script 'animationStateController' no se encontró en este GameObject.");
         }
     }
 
@@ -57,7 +57,8 @@ public class playerMovement : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space) && _isGrounded)
         {
-            _velocity.y = Mathf.Sqrt(jumpHeight * -1f * gravity);
+            float jumpVelocity = Mathf.Sqrt(jumpHeight * -2f * Physics.gravity.y);
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpVelocity, rb.linearVelocity.z);
         }
 
         if (Input.GetKeyDown(KeyCode.W))
@@ -74,9 +75,9 @@ public class playerMovement : MonoBehaviour
     void FixedUpdate()
     {
 
-        // Rotaci�n
         _rotationAmount = _moveH * _rotationSpeed * Time.fixedDeltaTime;
-        transform.Rotate(0, _rotationAmount, 0);
+        Quaternion deltaRotation = Quaternion.Euler(0, _rotationAmount, 0);
+        rb.MoveRotation(rb.rotation * deltaRotation);
 
         Vector3 moveDirection = transform.forward * _moveV * speed;
 
@@ -99,7 +100,9 @@ public class playerMovement : MonoBehaviour
             Debug.Log(_isGrounded);
         }
 
-        Vector3 finalVelocity = new Vector3(moveDirection.x, _velocity.y, moveDirection.z);
+        Vector3 finalVelocity = moveDirection;
+        finalVelocity.y = rb.linearVelocity.y;
+
         rb.linearVelocity = finalVelocity;
 
     }
