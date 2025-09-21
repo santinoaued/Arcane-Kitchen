@@ -44,15 +44,13 @@ public class playerMovement : MonoBehaviour
         _isGrounded = Physics.Raycast(
             groundCheck.position,
             Vector3.down,
-            groundDistance + 0.2f,
+            groundDistance + 0.3f,
             groundLayer
         );
 
-
-
         if (_isGrounded && _velocity.y < 0)
         {
-            _velocity.y = -2f;
+            _velocity.y = -3f;
         }
 
         if (Input.GetKeyDown(KeyCode.Space) && _isGrounded)
@@ -60,12 +58,6 @@ public class playerMovement : MonoBehaviour
             float jumpVelocity = Mathf.Sqrt(jumpHeight * -2f * Physics.gravity.y);
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpVelocity, rb.linearVelocity.z);
         }
-
-        if (Input.GetKeyDown(KeyCode.W))
-        {
-            Debug.Log("Presiona W");
-        }
-
 
         _velocity.y += gravity * Time.deltaTime;
 
@@ -90,15 +82,10 @@ public class playerMovement : MonoBehaviour
 
         if (_moveV < 0)
         {
-            Debug.Log("Vertical " + _moveV);
+            // Debug.Log("Vertical " + _moveV);
             moveDirection *= 0.75f;
         }
 
-
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            Debug.Log(_isGrounded);
-        }
 
         Vector3 finalVelocity = moveDirection;
         finalVelocity.y = rb.linearVelocity.y;

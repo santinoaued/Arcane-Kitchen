@@ -10,7 +10,7 @@ public class animationStateController : MonoBehaviour
     int isRunningHash;
 
     // int isJumpingHash;
-    int jumpTriggerHash;
+    //int jumpTriggerHash;
 
     private bool _isGrounded = true;
 
@@ -24,8 +24,7 @@ public class animationStateController : MonoBehaviour
         isRunningHash = Animator.StringToHash("isRunning");
 
         // isJumpingHash = Animator.StringToHash("isJumping");
-        jumpTriggerHash = Animator.StringToHash("jumpTrigger");
-
+        //jumpTriggerHash = Animator.StringToHash("jumpTrigger");
 
     }
 
@@ -77,18 +76,18 @@ public class animationStateController : MonoBehaviour
             animator.SetBool(isRunningHash, false);
         }
 
-        if (jumpPressed && _isGrounded)
-        {
-            JumpTrigger();
-            Debug.Log("Entra por el salto");
-        }
+        //if (jumpPressed && _isGrounded)
+        //{
+        //    JumpTrigger();
+        //    Debug.Log("Entra por el salto");
+        //}
 
     }
 
-    public void JumpTrigger()
-    {
-        animator.SetTrigger(jumpTriggerHash);
-    }
+    //public void JumpTrigger()
+    //{
+    //    animator.SetTrigger(jumpTriggerHash);
+    //}
 
     public void IsGrounded(bool valor)
     {
