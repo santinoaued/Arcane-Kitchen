@@ -15621,6 +15621,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 343260712456068097, guid: 253af59e9474a7d4bb8330d62d0967f4, type: 3}
+      propertyPath: patrolPointReachedDistance
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 343260712456068097, guid: 253af59e9474a7d4bb8330d62d0967f4, type: 3}
       propertyPath: 'patrolPoints.Array.data[0]'
       value: 
       objectReference: {fileID: 1637099203}
