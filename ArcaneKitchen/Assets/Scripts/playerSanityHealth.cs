@@ -40,13 +40,17 @@ public class playerSanityHealth : MonoBehaviour
         }
 
         Debug.Log($"Tu cordura está en : {CorduraActual}/{CorduraMaxima}");
-
     }
 
     public void Tranquilizarse()
     {
+        if (corduraActual == corduraMaxima) return;
+
         corduraActual = Mathf.Min(corduraMaxima, corduraActual + 1);
         onCorduraCambiada.Invoke();
+
+        Debug.Log($"Tu cordura está en : {CorduraActual}/{CorduraMaxima}");
+
     }
 
     private void RestablecerCordura()

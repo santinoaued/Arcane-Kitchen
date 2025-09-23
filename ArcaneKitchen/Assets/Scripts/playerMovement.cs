@@ -2,17 +2,25 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 public class playerMovement : MonoBehaviour
 {
-    [Header("Movimiento")]
-    [SerializeField] float speed = 3f;
-    [SerializeField] float runSpeed = 2f;
-    [SerializeField] float _rotationSpeed = 150f;
-
+    [Header("Stats")]
     [SerializeField] float jumpHeight = 1.5f;
+    [SerializeField] float speed = 1.5f;
+
+    [Header("Frenesí")]
+    [SerializeField] float multiJumpHeight = 1.5f;
+    [SerializeField] float multiSpeed = 1.5f;
+
+    [Header("Movimiento")]
+    [SerializeField] float runSpeed = 1.5f;
     [SerializeField] float gravity = -9.81f;
+    [SerializeField] float _rotationSpeed = 150f;
     [SerializeField] Transform groundCheck;
     [SerializeField] float groundDistance = 0.4f;
-
     [SerializeField] LayerMask groundLayer;
+
+    private float actualSpeed;
+    private float actualJumpHeight;
+    private playerSanityHealth cordura;
 
     Rigidbody rb;
 
@@ -28,11 +36,17 @@ public class playerMovement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
+        cordura = GetComponent<playerSanityHealth>();
+
+        actualSpeed = speed;
+        actualJumpHeight = jumpHeight;
 
         if (animationController == null)
         {
             Debug.LogError("El script 'animationStateController' no se encontró en este GameObject.");
         }
+
+        FrenesiController.OnFrenesiChanged += AddStatsFrenesi;
     }
 
     void Update()
@@ -44,13 +58,20 @@ public class playerMovement : MonoBehaviour
         _isGrounded = Physics.Raycast(
             groundCheck.position,
             Vector3.down,
-            groundDistance + 0.3f,
+            groundDistance + 0.5f,
             groundLayer
         );
 
         if (_isGrounded && _velocity.y < 0)
         {
             _velocity.y = -3f;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            rb.AddForce(Vector3.up * actualJumpHeight * 3, ForceMode.Impulse);
+            Debug.Log("Salta (?");
+            Debug.Log(_isGrounded);
         }
 
         if (Input.GetKeyDown(KeyCode.Space) && _isGrounded)
@@ -62,6 +83,7 @@ public class playerMovement : MonoBehaviour
         _velocity.y += gravity * Time.deltaTime;
 
         animationController.IsGrounded(_isGrounded);
+
     }
 
     void FixedUpdate()
@@ -92,5 +114,24 @@ public class playerMovement : MonoBehaviour
 
         rb.linearVelocity = finalVelocity;
 
+    }
+
+    void AddStatsFrenesi(bool frenesiActivo)
+    {
+        if (frenesiActivo)
+        {
+            actualSpeed = speed * multiSpeed;
+            actualJumpHeight = jumpHeight * multiJumpHeight;
+            Debug.Log("¡Movimiento Frenesí ACTIVADO!");
+        } else {
+            actualSpeed = speed;
+            actualJumpHeight = jumpHeight;
+            Debug.Log("Movimiento normal restaurado");
+        }
+    }
+    void OnDestroy()
+    {
+        // IMPORTANTE: Desuscribirse
+        FrenesiController.OnFrenesiChanged -= AddStatsFrenesi;
     }
 }
