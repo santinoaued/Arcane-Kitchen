@@ -130,22 +130,22 @@ public class PatrolEnemy : MonoBehaviour
     }
 
 
-    public void OnAttackHit()
-    {
-        if (player == null || isDead) return;
-        if (Vector3.Distance(transform.position, player.position) <= attackRange + 0.5f)
-        {
-            var ph = player.GetComponent<PlayerHealth>();
-            if (ph != null)
-            {
-                ph.TakeDamage(attackDamage);
-            }
-            else
-            {
-                Debug.Log("[PatrolEnemy] OnAttackHit: jugador golpeado (no se encontró PlayerHealth).");
-            }
-        }
-    }
+    //public void OnAttackHit()
+    //{
+    //    if (player == null || isDead) return;
+    //    if (Vector3.Distance(transform.position, player.position) <= attackRange + 0.5f)
+    //    {
+    //        var ph = player.GetComponent<PlayerHealth>();
+    //        if (ph != null)
+    //        {
+    //            ph.TakeDamage(attackDamage);
+    //        }
+    //        else
+    //        {
+    //            Debug.Log("[PatrolEnemy] OnAttackHit: jugador golpeado (no se encontró PlayerHealth).");
+    //        }
+    //    }
+    //}
 
 
     public void TakeDamage(int dmg)

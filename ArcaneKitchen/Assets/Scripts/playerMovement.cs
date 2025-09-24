@@ -7,8 +7,8 @@ public class playerMovement : MonoBehaviour
     [SerializeField] float speed = 1.5f;
 
     [Header("Frenesí")]
-    [SerializeField] float multiJumpHeight = 1.5f;
-    [SerializeField] float multiSpeed = 1.5f;
+    [SerializeField] float multiJumpHeight = 2f;
+    [SerializeField] float multiSpeed = 2f;
 
     [Header("Movimiento")]
     [SerializeField] float runSpeed = 1.5f;
@@ -76,8 +76,9 @@ public class playerMovement : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space) && _isGrounded)
         {
-            float jumpVelocity = Mathf.Sqrt(jumpHeight * -2f * Physics.gravity.y);
-            rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpVelocity, rb.linearVelocity.z);
+            float jumpForce = Mathf.Sqrt(jumpHeight * multiJumpHeight * -2f * Physics.gravity.y);
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
+            Debug.Log($"Salto frenesí! Fuerza: {jumpForce}, Multiplicador: {multiJumpHeight}");
         }
 
         _velocity.y += gravity * Time.deltaTime;
@@ -93,7 +94,7 @@ public class playerMovement : MonoBehaviour
         Quaternion deltaRotation = Quaternion.Euler(0, _rotationAmount, 0);
         rb.MoveRotation(rb.rotation * deltaRotation);
 
-        Vector3 moveDirection = transform.forward * _moveV * speed;
+        Vector3 moveDirection = transform.forward * _moveV * (speed * multiSpeed);
 
 
         if (Input.GetKey(KeyCode.LeftShift))
@@ -104,7 +105,6 @@ public class playerMovement : MonoBehaviour
 
         if (_moveV < 0)
         {
-            // Debug.Log("Vertical " + _moveV);
             moveDirection *= 0.75f;
         }
 
@@ -120,18 +120,21 @@ public class playerMovement : MonoBehaviour
     {
         if (frenesiActivo)
         {
-            actualSpeed = speed * multiSpeed;
-            actualJumpHeight = jumpHeight * multiJumpHeight;
+            multiSpeed = 2f;
+            multiJumpHeight = 2f;
             Debug.Log("¡Movimiento Frenesí ACTIVADO!");
-        } else {
-            actualSpeed = speed;
-            actualJumpHeight = jumpHeight;
+        }
+        else
+        {
+            multiSpeed = 1f;     
+            multiJumpHeight = 1f;
             Debug.Log("Movimiento normal restaurado");
         }
+
+        Debug.Log($"MultiSpeed: {multiSpeed}, MultiJump: {multiJumpHeight}");
     }
     void OnDestroy()
     {
-        // IMPORTANTE: Desuscribirse
         FrenesiController.OnFrenesiChanged -= AddStatsFrenesi;
     }
 }
