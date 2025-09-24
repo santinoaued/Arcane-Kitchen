@@ -1,13 +1,14 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody), typeof(Collider))]
 public class EnemyBullet : MonoBehaviour
 {
     [Header("Projectile Settings")]
-    [SerializeField] private float speed = 20f;       // Velocidad del proyectil
-    [SerializeField] private float damage = 10f;      // Daño que inflige el proyectil
-    [SerializeField] private float lifetime = 5f;     // Tiempo de vida del proyectil en segundos
+    [SerializeField] private float speed = 12f;       // Velocidad del proyectil
+    [SerializeField] private float damage = 10f;      // Daño que inflige el proyectil (se castea a int)
+    [SerializeField] private float lifetime = 6f;     // Tiempo de vida del proyectil en segundos
 
-    private Rigidbody rb;
+    Rigidbody rb;
 
     void Awake()
     {
@@ -18,19 +19,37 @@ public class EnemyBullet : MonoBehaviour
             enabled = false;
             return;
         }
+
+        // Configuración física por defecto: no seguir la gravedad para trayecto recto
         rb.isKinematic = false;
         rb.useGravity = false;
-        // Opcional: Si la bala tiene rotación por alguna razón, puedes congelarla para un movimiento recto.
-        // rb.freezeRotation = true;
+
+        // Asegurar que el collider está configurado para trigger si queremos OnTriggerEnter
+        var col = GetComponent<Collider>();
+        if (col != null)
+        {
+            // opcional: preferible isTrigger = true para proyectiles que no rebotan
+            // col.isTrigger = true;
+        }
     }
 
     void Start()
     {
-        // Aplicamos la velocidad solo una vez en Start.
-        rb.linearVelocity = transform.forward * speed;
-
         // Destruye el proyectil después de su tiempo de vida
         Destroy(gameObject, lifetime);
+    }
+
+    /// <summary>
+    /// Inicializa la bala con una velocidad en una dirección dada (llamar desde el spawner).
+    /// </summary>
+    public void Initialize(Vector3 direction, float initialSpeed)
+    {
+        if (rb != null)
+        {
+            rb.linearVelocity = direction.normalized * initialSpeed;
+            // Orientar la bala hacia la dirección (opcional)
+            transform.rotation = Quaternion.LookRotation(direction.normalized);
+        }
     }
 
     void OnTriggerEnter(Collider other)
@@ -47,9 +66,16 @@ public class EnemyBullet : MonoBehaviour
     {
         if (collidedObject.CompareTag("Player"))
         {
-            Debug.Log("Proyectil golpeó al jugador! Daño: " + damage);
-            // Lógica para aplicar daño al jugador
+            // Intentamos con tu sistema de cordura/vida
+            var sanity = collidedObject.GetComponent<playerSanityHealth>();
+            if (sanity != null)
+            {
+                sanity.RecibirDanioCordura((int)damage);
+            }
+            
         }
+
+        // Destruir la bala al colisionar con algo (evita múltiples impactos)
         Destroy(gameObject);
     }
 }
