@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI; 
 
 public class playerSanityHealth : MonoBehaviour
 {
@@ -8,6 +10,9 @@ public class playerSanityHealth : MonoBehaviour
     [SerializeField] int corduraActual;
     [SerializeField] int vidaMaxima = 3;
     [SerializeField] int vidaActual;
+
+    [Header("UI")]
+    [SerializeField] Slider corduraSlider; 
 
     [Header("Eventos")]
     [SerializeField] UnityEvent onCorduraCambiada;
@@ -24,38 +29,50 @@ public class playerSanityHealth : MonoBehaviour
     void Start()
     {
         corduraActual = corduraMaxima;
-        vidaActual = vidaMaxima;
+        if (PlayerPrefs.HasKey("VidasRestantes"))
+            vidaActual = PlayerPrefs.GetInt("VidasRestantes");
+        else
+            vidaActual = vidaMaxima;
+        ActualizarCorduraUI(); 
     }
 
     public void RecibirDanioCordura(int danioRealizado)
     {
-        if (corduraActual <= 1) return;
+        if (corduraActual <= 1 && danioRealizado > 0) return;
 
         corduraActual = Mathf.Max(0, corduraActual - danioRealizado);
+        ActualizarCorduraUI();
 
         if (corduraActual < 1)
         {
             PerderVida();
-            corduraActual = corduraMaxima;
+
+            if (vidaActual > 0)
+            {
+                RestablecerCordura();
+            }
+
         }
 
-        Debug.Log($"Tu cordura está en : {CorduraActual}/{CorduraMaxima}");
+        Debug.Log("Tu cordura está en : {CorduraActual}/{CorduraMaxima}");
     }
+
 
     public void Tranquilizarse()
     {
         if (corduraActual == corduraMaxima) return;
 
         corduraActual = Mathf.Min(corduraMaxima, corduraActual + 1);
+        ActualizarCorduraUI(); 
         onCorduraCambiada.Invoke();
 
         Debug.Log($"Tu cordura está en : {CorduraActual}/{CorduraMaxima}");
-
     }
 
     private void RestablecerCordura()
     {
         corduraActual = corduraMaxima;
+        ActualizarCorduraUI(); 
         onCorduraCambiada.Invoke();
     }
 
@@ -63,6 +80,7 @@ public class playerSanityHealth : MonoBehaviour
     {
         vidaActual = Mathf.Max(0, vidaActual - 1);
         onVidaCambiada.Invoke();
+        ActualizarCorduraUI();
 
         if (vidaActual < 1)
         {
@@ -71,8 +89,16 @@ public class playerSanityHealth : MonoBehaviour
         else
         {
             Debug.Log("Pierde vida");
+
+            // guarda las vidas que le quedan
+            PlayerPrefs.SetInt("VidasRestantes", vidaActual);
+            PlayerPrefs.Save();
+
+            // recarga la escena
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
+
 
     public void CurarVida(int cantidad)
     {
@@ -83,14 +109,30 @@ public class playerSanityHealth : MonoBehaviour
     private void Morir()
     {
         Debug.Log("Moriste we");
+        onMuerte.Invoke();
+
+        // borra el registro de vidas guardadas 
+        PlayerPrefs.DeleteKey("VidasRestantes");
+
+        SceneManager.LoadScene("GameOver");
     }
 
     public void ReiniciarTodo()
     {
         vidaActual = vidaMaxima;
         corduraActual = corduraMaxima;
+        ActualizarCorduraUI(); 
         onVidaCambiada.Invoke();
         onCorduraCambiada.Invoke();
     }
 
+    
+    private void ActualizarCorduraUI()
+    {
+        if (corduraSlider != null)
+        {
+            corduraSlider.maxValue = corduraMaxima;
+            corduraSlider.value = corduraActual;
+        }
+    }
 }
