@@ -43,48 +43,46 @@ public class PatrolEnemy : MonoBehaviour
     {
         if (isDead) return;
 
-        attackTimer -= Time.deltaTime; // Reduce el cooldown del ataque
+        attackTimer -= Time.deltaTime; 
 
-        // Si el jugador está dentro del rango de detección
         if (player != null && Vector3.Distance(transform.position, player.position) <= detectionRange)
         {
             float distToPlayer = Vector3.Distance(transform.position, player.position);
 
-            // Si el jugador está dentro del rango de ataque
+            
             if (distToPlayer <= attackRange)
             {
-                FaceTarget(player.position); // Mira al jugador
-                SetWalking(false); // Deja de caminar
-
-                // Si el cooldown ha terminado, ataca
+                FaceTarget(player.position); 
+                SetWalking(false); 
+                
                 if (attackTimer <= 0f)
                 {
-                    // ***** Lógica de Daño AHORA *****
+                    
                     var ph = player.GetComponent<playerSanityHealth>();
                     if (ph != null)
                     {
                         ph.RecibirDanioCordura(attackDamage);
-                        Debug.Log("¡El enemigo ha dañado al jugador!"); // Debug para ver si se ejecuta el daño
+                        Debug.Log("¡El enemigo ha dañado al jugador!"); 
                     }
                     else
                     {
                         Debug.LogWarning("No se encontró el componente playerSanityHealth en el jugador.");
                     }
 
-                    // Dispara la animación de ataque (solo visual)
+                    
                     animator.SetTrigger("Attack");
-                    attackTimer = attackCooldown; // Reinicia el cooldown
+                    attackTimer = attackCooldown; 
                 }
-                return; // Ya hemos decidido atacar o esperar al cooldown, así que salimos del Update
+                return; 
             }
-            else // Si el jugador está dentro del rango de detección pero fuera del de ataque, se mueve hacia él
+            else 
             {
                 MoveTowards(player.position);
                 return;
             }
         }
 
-        // Lógica de patrulla (solo si no hay jugador cerca)
+        
         if (waypoints == null || waypoints.Length == 0) return;
 
         Transform wp = waypoints[currentWaypoint];
@@ -113,8 +111,8 @@ public class PatrolEnemy : MonoBehaviour
     void MoveTowards(Vector3 target)
     {
         Vector3 dir = target - transform.position;
-        dir.y = 0f; // Asegúrate de que el movimiento sea solo en el plano XZ
-        if (dir.sqrMagnitude < 0.0001f) // Evita divisiones por cero con vectores muy pequeños
+        dir.y = 0f; 
+        if (dir.sqrMagnitude < 0.0001f) 
         {
             SetWalking(false);
             return;
@@ -130,8 +128,8 @@ public class PatrolEnemy : MonoBehaviour
     void FaceTarget(Vector3 target)
     {
         Vector3 dir = target - transform.position;
-        dir.y = 0f; // Solo rota en el eje Y
-        if (dir.sqrMagnitude > 0.0001f) // Evita rotaciones erráticas con vectores muy pequeños
+        dir.y = 0f; 
+        if (dir.sqrMagnitude > 0.0001f) 
         {
             Quaternion targetRot = Quaternion.LookRotation(dir);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, 10f * Time.deltaTime);
@@ -145,8 +143,6 @@ public class PatrolEnemy : MonoBehaviour
     }
 
 
-    // El método OnAttackHit() ha sido eliminado.
-    // La lógica de daño ahora está directamente en Update() cuando se cumple la condición de ataque.
 
 
     public void TakeDamage(int dmg)
