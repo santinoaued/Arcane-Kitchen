@@ -8,8 +8,10 @@ public class MainMenu : MonoBehaviour
 
     void Start()
     {
-        // Solo aplicar en escenas >= 1 (escenas de juego)
-        if (SceneManager.GetActiveScene().buildIndex >= 1)
+        int index = SceneManager.GetActiveScene().buildIndex;
+
+        // Solo aplicar en escenas de juego (>=1) y que no sean la de "Perder"
+        if (index >= 1 && index != 2) // <-- cambia 2 por el índice real de tu escena perder
         {
             Time.timeScale = 1f;
             Cursor.visible = false;
@@ -22,8 +24,10 @@ public class MainMenu : MonoBehaviour
 
     void Update()
     {
-        // Solo aplicar en escenas >= 1
-        if (SceneManager.GetActiveScene().buildIndex >= 1)
+        int index = SceneManager.GetActiveScene().buildIndex;
+
+        // Solo aplicar en escenas de juego (>=1) y que no sean la de "Perder"
+        if (index >= 1 && index != 2)
         {
             // Atajo con ESC solo si existe un menú de pausa asignado
             if (pauseMenu != null && Input.GetKeyDown(KeyCode.Escape))
@@ -47,7 +51,7 @@ public class MainMenu : MonoBehaviour
     {
         SceneManager.LoadScene(numeroNivel);
 
-        if (numeroNivel >= 1)
+        if (numeroNivel >= 1 && numeroNivel != 2) // excluir escena perder
         {
             Time.timeScale = 1f;
             Cursor.visible = false;
@@ -90,7 +94,7 @@ public class MainMenu : MonoBehaviour
         int index = SceneManager.GetActiveScene().buildIndex;
         SceneManager.LoadScene(index);
 
-        if (index >= 1)
+        if (index >= 1 && index != 2) // excluir escena perder
         {
             Time.timeScale = 1f;
             Cursor.visible = false;
