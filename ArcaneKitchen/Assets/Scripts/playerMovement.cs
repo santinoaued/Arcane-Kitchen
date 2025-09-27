@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+
 public class playerMovement : MonoBehaviour
 {
     [Header("Stats")]
@@ -15,7 +16,7 @@ public class playerMovement : MonoBehaviour
     [SerializeField] float gravity = -9.81f;
     [SerializeField] float _rotationSpeed = 150f;
     [SerializeField] Transform groundCheck;
-    [SerializeField] float groundDistance = 0.4f;
+    [SerializeField] float groundDistance = 0.25f;         
     [SerializeField] LayerMask groundLayer;
 
     private float actualSpeed;
@@ -35,7 +36,11 @@ public class playerMovement : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
+        
         rb.freezeRotation = true;
+        rb.interpolation = RigidbodyInterpolation.Interpolate;
+        rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+
         cordura = GetComponent<playerSanityHealth>();
 
         actualSpeed = speed;
@@ -51,69 +56,71 @@ public class playerMovement : MonoBehaviour
 
     void Update()
     {
-
         _moveH = Input.GetAxis("Horizontal");
         _moveV = Input.GetAxis("Vertical");
 
-        _isGrounded = Physics.Raycast(
-            groundCheck.position,
-            Vector3.down,
-            groundDistance + 0.5f,
-            groundLayer
-        );
+        
+        _isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundLayer);
 
-        if (_isGrounded && _velocity.y < 0)
+        
+        if (_isGrounded && rb.linearVelocity.y < 0f)
         {
-            _velocity.y = -3f;
+            
+            Vector3 v = rb.linearVelocity;
+            v.y = -2f;
+            rb.linearVelocity = v;
         }
 
-        if (Input.GetKeyDown(KeyCode.Q))
+        
+        if (Input.GetKeyDown(KeyCode.Q) && _isGrounded)
         {
-            rb.AddForce(Vector3.up * actualJumpHeight * 3, ForceMode.Impulse);
-            Debug.Log("Salta (?");
-            Debug.Log(_isGrounded);
+            float jumpForce = Mathf.Sqrt(2f * Mathf.Abs(Physics.gravity.y) * jumpHeight);
+            Vector3 v = rb.linearVelocity;
+            v.y = jumpForce;
+            rb.linearVelocity = v;
+            
         }
 
+        
         if (Input.GetKeyDown(KeyCode.Space) && _isGrounded)
         {
-            float jumpForce = Mathf.Sqrt(jumpHeight * multiJumpHeight * -2f * Physics.gravity.y);
-            rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
-            Debug.Log($"Salto frenesí! Fuerza: {jumpForce}, Multiplicador: {multiJumpHeight}");
+            float jumpForce = Mathf.Sqrt(2f * Mathf.Abs(Physics.gravity.y) * (jumpHeight * multiJumpHeight));
+            Vector3 v = rb.linearVelocity;
+            v.y = jumpForce;
+            rb.linearVelocity = v;
+            
         }
 
-        _velocity.y += gravity * Time.deltaTime;
+        
 
         animationController.IsGrounded(_isGrounded);
-
     }
 
     void FixedUpdate()
     {
-
+        
         _rotationAmount = _moveH * _rotationSpeed * Time.fixedDeltaTime;
         Quaternion deltaRotation = Quaternion.Euler(0, _rotationAmount, 0);
         rb.MoveRotation(rb.rotation * deltaRotation);
 
-        Vector3 moveDirection = transform.forward * _moveV * (speed * multiSpeed);
-
+        
+        Vector3 localForward = transform.forward * _moveV * (speed * multiSpeed);
 
         if (Input.GetKey(KeyCode.LeftShift))
         {
-            moveDirection *= runSpeed;
+            localForward *= runSpeed;
         }
-
 
         if (_moveV < 0)
         {
-            moveDirection *= 0.75f;
+            localForward *= 0.75f;
         }
 
+        
+        Vector3 horizontalMove = new Vector3(localForward.x, 0f, localForward.z);
+        Vector3 newPosition = rb.position + horizontalMove * Time.fixedDeltaTime;
 
-        Vector3 finalVelocity = moveDirection;
-        finalVelocity.y = rb.linearVelocity.y;
-
-        rb.linearVelocity = finalVelocity;
-
+        rb.MovePosition(newPosition);
     }
 
     void AddStatsFrenesi(bool frenesiActivo)
@@ -126,15 +133,26 @@ public class playerMovement : MonoBehaviour
         }
         else
         {
-            multiSpeed = 1f;     
+            multiSpeed = 1f;
             multiJumpHeight = 1f;
             Debug.Log("Movimiento normal restaurado");
         }
 
         Debug.Log($"MultiSpeed: {multiSpeed}, MultiJump: {multiJumpHeight}");
     }
+
     void OnDestroy()
     {
         FrenesiController.OnFrenesiChanged -= AddStatsFrenesi;
+    }
+
+   
+    void OnDrawGizmosSelected()
+    {
+        if (groundCheck != null)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(groundCheck.position, groundDistance);
+        }
     }
 }

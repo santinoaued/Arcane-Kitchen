@@ -11,8 +11,9 @@ public class playerSanityHealth : MonoBehaviour
     [SerializeField] int vidaMaxima = 3;
     [SerializeField] int vidaActual;
 
-    [Header("UI")]
+    [Header("HUD")]
     [SerializeField] Slider corduraSlider;
+    
 
     [Header("Eventos")]
     [SerializeField] UnityEvent onCorduraCambiada;
