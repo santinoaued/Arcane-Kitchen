@@ -47,6 +47,15 @@ public class MainMenu : MonoBehaviour
         }
     }
 
+    public void IrAInstrucciones()
+    {
+        SceneManager.LoadScene("Instrucciones");
+
+        Time.timeScale = 1f;
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+    }
+
     public void CambiarNivel(int numeroNivel)
     {
         SceneManager.LoadScene(numeroNivel);
